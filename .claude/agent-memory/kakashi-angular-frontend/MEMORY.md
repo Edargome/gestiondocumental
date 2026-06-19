@@ -1,0 +1,2 @@
+- [Theme system](project-theme-system.md) — light/dark mode con ThemeService, CSS custom properties y clase .dark-theme en body
+- [Dialog patterns](project-dialog-patterns.md) — estructura, inyección y comunicación de dialogs con WorkplaceComponent

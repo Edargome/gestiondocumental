@@ -1,0 +1,52 @@
+<div mat-dialog-content>
+  <div
+    class="header"
+    style="
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    "
+  >
+    <p>Permisos</p>
+    <a (click)="onNoClick()" style="color: red">
+      <mat-icon>highlight_off</mat-icon>
+    </a>
+  </div>
+  <div *ngIf="!loading; else loadingTemplate">
+    <form [formGroup]="permissionsForm">
+      <div formArrayName="users">
+        <div
+          style="
+            display: flex;
+            flex-direction: row;
+            gap: 8px;
+            align-items: center;
+            justify-content: end;
+          "
+          *ngFor="let user of users.controls; let i = index"
+          [formGroupName]="i"
+        >
+          <h3>{{ user.get("username")?.value }}</h3>
+          <label>
+            Lectura:
+            <input type="checkbox" formControlName="can_read" />
+          </label>
+          <label>
+            Escritura:
+            <input type="checkbox" formControlName="can_write" />
+          </label>
+          <label>
+            Eliminar:
+            <input type="checkbox" formControlName="can_delete" />
+          </label>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <ng-template #loadingTemplate>
+    <mat-spinner></mat-spinner>
+  </ng-template>
+</div>

@@ -1,0 +1,27 @@
+<div mat-dialog-content>
+  <div
+    style="
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    "
+  >
+    <p>Restaurar {{ data.type === 'file' ? 'archivo' : 'carpeta' }}</p>
+    <a (click)="onNoClick()" style="color: red; cursor: pointer">
+      <mat-icon>highlight_off</mat-icon>
+    </a>
+  </div>
+  <div
+    style="
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    "
+  >
+    <h2>¿Está seguro de restaurar "{{ data.name }}"?</h2>
+    <button mat-flat-button color="primary" (click)="restore()">Restaurar</button>
+  </div>
+</div>

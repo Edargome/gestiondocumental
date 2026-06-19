@@ -1,0 +1,164 @@
+<div *ngIf="isLoading" class="spinner-container">
+  <mat-progress-spinner color="primary" mode="indeterminate">
+  </mat-progress-spinner>
+</div>
+<div *ngIf="!isLoading">
+  <nav
+    style="display: flex; flex-direction: row; justify-content: space-between"
+  >
+    <div
+      style="
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 1px;
+      "
+    >
+      <div *ngFor="let path of folderPath">
+        <a (click)="actionClic(path.folder_id, 'folder')" style="color: blue"
+          >{{ path.name }} /</a
+        >
+      </div>
+    </div>
+    <div
+      style="
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+      "
+    >
+      <a (click)="openDialogFolder()"
+        ><mat-icon>create_new_folder</mat-icon> Nueva carpeta</a
+      >
+      <a (click)="openDialogFile()"
+        ><mat-icon>note_add</mat-icon> Nuevo documento</a
+      >
+    </div>
+  </nav>
+  <section>
+    <div class="mat-elevation-z8">
+      <table
+        mat-table
+        [dataSource]="dataSource"
+        matSort
+        (matSortChange)="announceSortChange($event)"
+        class="mat-elevation-z8"
+      >
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre</th>
+          <td mat-cell *matCellDef="let row">
+            <div
+              style="display: flex; align-items: center; cursor: pointer"
+              (click)="actionClic(row.id, row.type)"
+              (dblclick)="downFile(row.id)"
+            >
+              <mat-icon [color]="row.type == 'folder' ? 'accent' : 'primary'">{{
+                row.type
+              }}</mat-icon
+              >{{ row.name }}
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="created_at">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Creado</th>
+          <td mat-cell *matCellDef="let row">{{ row.created_at | date }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="updated_at">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Actualizado</th>
+          <td mat-cell *matCellDef="let row">{{ row.updated_at | date }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="action">
+          <th mat-header-cell *matHeaderCellDef>Acciones</th>
+          <td mat-cell *matCellDef="let row">
+            <div *ngIf="row.type == 'task'; else actionFolder">
+              <button
+                matTooltip="Actualizar versión"
+                style="margin-right: 4px"
+                mat-mini-fab
+                color="accent"
+                (click)="openDialogUpdateFile(row.id)"
+              >
+                <mat-icon>outbox</mat-icon>
+              </button>
+              <!-- <button
+                matTooltip="Descargar archivo"
+                style="margin-right: 4px"
+                mat-mini-fab
+                color="accent"
+                (click)="downFile(row.id)"
+              >
+                <mat-icon>download</mat-icon>
+              </button> -->
+              <button
+                matTooltip="Permisos"
+                style="margin-right: 4px"
+                mat-mini-fab
+                color="primary"
+                (click)="setPermissions(row.id)"
+              >
+                <mat-icon>lock</mat-icon>
+              </button>
+              <button
+                matTooltip="Mover"
+                style="margin-right: 4px"
+                mat-mini-fab
+                color="primary"
+                (click)="openMoveDialog(row)"
+              >
+                <mat-icon>drive_file_move</mat-icon>
+              </button>
+              <button
+                matTooltip="Eliminar"
+                style="margin-right: 4px"
+                mat-mini-fab
+                color="warn"
+                (click)="deleteFile(row)"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+            <ng-template #actionFolder>
+              <div *ngIf="accessLevel != null && accessLevel <= '2'">
+                <button
+                  matTooltip="Editar"
+                  style="margin-right: 4px"
+                  mat-mini-fab
+                  color="primary"
+                  (click)="openDialogEditFolder(row)"
+                >
+                  <mat-icon>edit_square</mat-icon>
+                </button>
+                <button
+                  matTooltip="Mover"
+                  style="margin-right: 4px"
+                  mat-mini-fab
+                  color="primary"
+                  (click)="openMoveDialog(row)"
+                >
+                  <mat-icon>drive_file_move</mat-icon>
+                </button>
+                <button
+                  matTooltip="Eliminar"
+                  style="margin-right: 4px"
+                  mat-mini-fab
+                  color="warn"
+                  (click)="deleteFolder(row.id)"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </ng-template>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+    </div>
+  </section>
+</div>

@@ -1,0 +1,93 @@
+<section>
+  <h4>Detalle del documento</h4>
+  <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
+    <mat-tab label="Propiedades">
+      <div *ngIf="file?.fileData != null">
+        <p>
+          <b>Nombre:</b> {{ file?.fileData?.name }}{{ file?.fileData?.extname }}
+        </p>
+      </div>
+      <div>
+        <p><b>Autor:</b> {{ file?.fileData?.username }}</p>
+      </div>
+      <div>
+        <p><b>Fecha de creación:</b> {{ file?.fileData?.created_at | date }}</p>
+      </div>
+      <div>
+        <p><b>Actualizó:</b> {{ file?.fileData?.username_updated }}</p>
+      </div>
+      <div>
+        <p>
+          <b>Última actualización:</b> {{ file?.fileData?.updated_at | date }}
+        </p>
+      </div>
+      <div *ngIf="file?.fileData != null" style="margin-top: 8px;">
+        <button
+          mat-flat-button
+          color="primary"
+          (click)="openOrDownloadActiveFile(file!.fileData.file_id)"
+        >
+          <mat-icon>{{ isViewable(file!.fileData.extname) ? 'open_in_new' : 'download' }}</mat-icon>
+          {{ isViewable(file!.fileData.extname) ? 'Abrir' : 'Descargar' }}
+        </button>
+      </div>
+    </mat-tab>
+    <mat-tab label="Versiones" *ngIf="file != null">
+      <div *ngFor="let version of file.versions">
+        <div
+          style="
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 16px;
+          "
+        >
+          <p><b>Versión:</b> {{ version.version_number }}</p>
+          <p><b>Fecha de creación:</b> {{ version.created_at | date }}</p>
+          <button
+            mat-flat-button
+            color="primary"
+            (click)="openOrDownloadVersion(file.fileData.file_id, version.version_number)"
+          >
+            <mat-icon>{{ isViewable(version.extname) ? 'open_in_new' : 'download' }}</mat-icon>
+            {{ isViewable(version.extname) ? 'Abrir' : 'Descargar' }}
+          </button>
+        </div>
+      </div>
+    </mat-tab>
+    <mat-tab label="Historial" *ngIf="history.length > 0">
+      <table mat-table [dataSource]="history" class="mat-elevation-z8">
+        <!-- Position Column -->
+        <ng-container matColumnDef="username">
+          <th mat-header-cell *matHeaderCellDef>Usuario</th>
+          <td mat-cell *matCellDef="let element">{{ element.username }}</td>
+        </ng-container>
+
+        <!-- Name Column -->
+        <ng-container matColumnDef="action">
+          <th mat-header-cell *matHeaderCellDef>Acción</th>
+          <td mat-cell *matCellDef="let element">{{ element.action }}</td>
+        </ng-container>
+
+        <!-- Weight Column -->
+        <ng-container matColumnDef="version_number">
+          <th mat-header-cell *matHeaderCellDef>Versión</th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.version_number }}
+          </td>
+        </ng-container>
+
+        <!-- Symbol Column -->
+        <ng-container matColumnDef="timestamp">
+          <th mat-header-cell *matHeaderCellDef>Fecha</th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.timestamp | date }}
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+    </mat-tab>
+  </mat-tab-group>
+</section>

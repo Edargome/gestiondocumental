@@ -1,0 +1,28 @@
+<nav>
+  <h1>Gestion Documental</h1>
+
+  <button
+    mat-icon-button
+    [attr.aria-label]="(isDark$ | async) ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
+    [attr.aria-pressed]="(isDark$ | async)"
+    (click)="toggleTheme()"
+  >
+    <mat-icon *ngIf="!(isDark$ | async)">dark_mode</mat-icon>
+    <mat-icon *ngIf="isDark$ | async">light_mode</mat-icon>
+  </button>
+
+  <button
+    *ngIf="accessLevel != null && accessLevel <= '2'"
+    mat-icon-button
+    [color]="showTrash ? 'warn' : ''"
+    [attr.aria-label]="showTrash ? 'Cerrar papelera' : 'Papelera de reciclaje'"
+    matTooltip="Papelera de reciclaje"
+    (click)="toggleTrash()"
+  >
+    <mat-icon>{{ showTrash ? 'delete_sweep' : 'delete_sweep' }}</mat-icon>
+  </button>
+
+  <button mat-icon-button aria-label="Salir" (click)="logout()">
+    <mat-icon>logout</mat-icon>
+  </button>
+</nav>

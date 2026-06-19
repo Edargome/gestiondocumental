@@ -1,0 +1,77 @@
+<div *ngIf="isLoading" class="spinner-container">
+  <mat-progress-spinner color="primary" mode="indeterminate"></mat-progress-spinner>
+</div>
+
+<div *ngIf="!isLoading">
+  <nav style="display: flex; flex-direction: row; align-items: center; padding: 8px 0; gap: 8px;">
+    <mat-icon color="warn">delete_sweep</mat-icon>
+    <h2 style="margin: 0;">Papelera de reciclaje</h2>
+  </nav>
+
+  <section>
+    <div class="mat-elevation-z8">
+      <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+
+        <ng-container matColumnDef="type">
+          <th mat-header-cell *matHeaderCellDef>Tipo</th>
+          <td mat-cell *matCellDef="let row">
+            <mat-icon [color]="row.type === 'folder' ? 'accent' : 'primary'">
+              {{ row.type === 'folder' ? 'folder' : 'task' }}
+            </mat-icon>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>Nombre</th>
+          <td mat-cell *matCellDef="let row">{{ row.name }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="parent_folder">
+          <th mat-header-cell *matHeaderCellDef>Carpeta padre</th>
+          <td mat-cell *matCellDef="let row">
+            <span>{{ row.parent_name || 'Raíz' }}</span>
+            <mat-icon
+              *ngIf="row.parent_isDelete === 1"
+              color="warn"
+              matTooltip="La carpeta padre también fue eliminada. Restaure primero la carpeta padre."
+              style="font-size: 16px; vertical-align: middle; margin-left: 4px;"
+            >warning</mat-icon>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="deleted_at">
+          <th mat-header-cell *matHeaderCellDef>Eliminado</th>
+          <td mat-cell *matCellDef="let row">{{ row.updated_at | date: 'dd/MM/yyyy HH:mm' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="deleted_by">
+          <th mat-header-cell *matHeaderCellDef>Eliminado por</th>
+          <td mat-cell *matCellDef="let row">{{ row.deleted_by || '-' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="action">
+          <th mat-header-cell *matHeaderCellDef>Acciones</th>
+          <td mat-cell *matCellDef="let row">
+            <button
+              mat-mini-fab
+              color="primary"
+              matTooltip="Restaurar"
+              (click)="openRestoreDialog(row)"
+            >
+              <mat-icon>restore</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell" [attr.colspan]="displayedColumns.length" style="text-align: center; padding: 24px;">
+            La papelera está vacía.
+          </td>
+        </tr>
+      </table>
+    </div>
+  </section>
+</div>

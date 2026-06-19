@@ -1,0 +1,12 @@
+div {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: row;
+  background-color: var(--content-bg);
+  transition: background-color 0.3s ease;
+
+  section {
+    width: 100%;
+  }
+}

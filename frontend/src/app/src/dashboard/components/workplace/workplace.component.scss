@@ -1,0 +1,45 @@
+section {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: calc(calc(100vh - 56px) / 2);
+  overflow-y: auto;
+}
+
+nav {
+  margin: 0;
+  height: 50px;
+  background-color: var(--toolbar-bg);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  width: 100%;
+  transition: background-color 0.3s ease;
+
+  a {
+    text-decoration: none;
+    color: var(--text-primary);
+    margin: 0;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+  }
+
+  a:hover {
+    cursor: pointer;
+  }
+}
+
+table {
+  width: 100%;
+}
+
+.mat-mdc-form-field {
+  font-size: 14px;
+  width: 100%;
+}
+
+td,
+th {
+  width: 25%;
+}

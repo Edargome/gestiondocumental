@@ -1,0 +1,23 @@
+nav {
+  background-color: var(--nav-bg);
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  height: 50px;
+  transition: background-color 0.3s ease;
+
+  h1 {
+    flex: 1;
+    color: var(--nav-text);
+    font-size: 14px;
+    margin: 0;
+    padding: 10px;
+  }
+
+  button {
+    color: var(--nav-text);
+  }
+}

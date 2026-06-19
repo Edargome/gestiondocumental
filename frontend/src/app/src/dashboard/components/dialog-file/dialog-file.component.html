@@ -1,0 +1,43 @@
+<div mat-dialog-content>
+  <div class="header">
+    <a (click)="onNoClick()">
+      <mat-icon>highlight_off</mat-icon>
+    </a>
+  </div>
+  <form [formGroup]="display" class="formContent">
+    <p class="title">Subir documento</p>
+    <mat-form-field appearance="outline">
+      <mat-label>Subir documento</mat-label>
+      <button mat-icon-button matPrefix (click)="f_input.click()">
+        <mat-icon>attach_file</mat-icon>
+      </button>
+      <input
+        type="text"
+        readonly
+        matInput
+        formControlName="fileControl"
+        (click)="f_input.click()"
+      />
+      <input type="file" hidden #f_input (change)="getFile($event)" />
+      <mat-error>El archivo es requerido</mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Descripción</mat-label>
+      <textarea
+        matInput
+        placeholder="Descripción del archivo"
+        formControlName="descControl"
+      ></textarea>
+    </mat-form-field>
+    <button
+      appearance="outline"
+      mat-stroked-button
+      color="primary"
+      [disabled]="display.invalid"
+      (click)="sendFile()"
+    >
+      Guardar &nbsp;
+      <mat-icon>save</mat-icon>
+    </button>
+  </form>
+</div>

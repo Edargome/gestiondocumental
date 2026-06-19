@@ -1,0 +1,67 @@
+<h2 mat-dialog-title>Mover "{{ data.name }}"</h2>
+
+<mat-dialog-content>
+  <p>Selecciona la carpeta destino:</p>
+
+  <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
+    <!-- Nodo hoja (sin hijos) -->
+    <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding>
+      <button mat-icon-button disabled aria-hidden="true">
+        <mat-icon>remove</mat-icon>
+      </button>
+      <span
+        class="folder-node"
+        [class.selected]="selectedFolderId === node.folder_id"
+        (click)="selectFolder(node.folder_id)"
+        role="button"
+        [attr.aria-label]="'Seleccionar carpeta ' + node.name"
+        [attr.aria-pressed]="selectedFolderId === node.folder_id"
+      >
+        <mat-icon color="accent">folder</mat-icon>
+        {{ node.name }}
+      </span>
+    </mat-tree-node>
+
+    <!-- Nodo expandible (con hijos) -->
+    <mat-tree-node
+      *matTreeNodeDef="let node; when: hasChild"
+      matTreeNodePadding
+    >
+      <button
+        mat-icon-button
+        matTreeNodeToggle
+        [attr.aria-label]="'Expandir ' + node.name"
+      >
+        <mat-icon class="mat-icon-rtl-mirror">
+          {{ treeControl.isExpanded(node) ? 'remove' : 'add' }}
+        </mat-icon>
+      </button>
+      <span
+        class="folder-node"
+        [class.selected]="selectedFolderId === node.folder_id"
+        (click)="selectFolder(node.folder_id)"
+        role="button"
+        [attr.aria-label]="'Seleccionar carpeta ' + node.name"
+        [attr.aria-pressed]="selectedFolderId === node.folder_id"
+      >
+        <mat-icon style="color: blue">
+          {{ treeControl.isExpanded(node) ? 'folder_open' : 'folder' }}
+        </mat-icon>
+        {{ node.name }}
+      </span>
+    </mat-tree-node>
+  </mat-tree>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onNoClick()" type="button">Cancelar</button>
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="confirm()"
+    [disabled]="selectedFolderId === null"
+    type="button"
+  >
+    Mover
+  </button>
+</mat-dialog-actions>

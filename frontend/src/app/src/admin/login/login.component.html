@@ -1,0 +1,45 @@
+<div class="content">
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <img src="/assets/logTorax.png" alt="Instituto del tórax" width="280" />
+    <mat-form-field appearance="outline">
+      <mat-label>Usuario</mat-label>
+      <input
+        matInput
+        formControlName="user"
+        type="text"
+        placeholder="Usuario"
+      />
+      <mat-icon matSuffix>person_2</mat-icon>
+      <mat-error *ngIf="loginForm.get('user')?.hasError('required')"
+        >El usuario es requerido</mat-error
+      >
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Contraseña</mat-label>
+      <input
+        matInput
+        formControlName="password"
+        type="password"
+        placeholder="Contraseña"
+      />
+      <mat-icon matSuffix>password</mat-icon>
+      <mat-error *ngIf="loginForm.get('password')?.hasError('required')"
+        >La contraseña es requerida</mat-error
+      >
+    </mat-form-field>
+
+    <button
+      mat-fab
+      extended
+      color="primary"
+      type="submit"
+      [disabled]="loginForm.invalid"
+    >
+      Iniciar Sesión
+      <mat-icon
+        ><span class="material-symbols-outlined"> task_alt </span></mat-icon
+      >
+    </button>
+  </form>
+</div>

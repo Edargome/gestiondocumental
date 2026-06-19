@@ -1,0 +1,11 @@
+<app-header (trashToggled)="onTrashToggled($event)"></app-header>
+<div>
+  <app-tree></app-tree>
+  <section>
+    <ng-container *ngIf="!showTrash">
+      <app-workplace></app-workplace>
+      <app-detail-file></app-detail-file>
+    </ng-container>
+    <app-trash *ngIf="showTrash"></app-trash>
+  </section>
+</div>

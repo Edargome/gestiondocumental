@@ -1,0 +1,21 @@
+section {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--detail-bg);
+  color: var(--text-primary);
+  padding: 8px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.mat-tab-group {
+  margin-bottom: 48px;
+}
+
+.enable {
+  background-color: aquamarine;
+}
+
+.disabled {
+  background-color: none;
+}
