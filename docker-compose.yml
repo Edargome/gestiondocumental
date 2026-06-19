@@ -1,0 +1,62 @@
+services:
+  mysql:
+    image: mysql:8
+    container_name: gesdoc-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PWD:-rootpwd}
+      MYSQL_DATABASE: ${DBNAME:-gestiondocumental}
+      MYSQL_USER: ${DBUSER:-gesdoc}
+      MYSQL_PASSWORD: ${DBPWD:-gesdocpwd}
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PWD:-rootpwd}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - gesdoc-net
+
+  backend:
+    build: ./backend
+    container_name: gesdoc-backend
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      PROD: "true"
+      DBHOST: mysql
+      DBUSER: ${DBUSER:-gesdoc}
+      DBPWD: ${DBPWD:-gesdocpwd}
+      DBNAME: ${DBNAME:-gestiondocumental}
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    volumes:
+      - uploads_data:/app/uploads
+    networks:
+      - gesdoc-net
+
+  frontend:
+    build: ./frontend
+    container_name: gesdoc-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "${FRONTEND_PORT:-4200}:80"
+    networks:
+      - gesdoc-net
+
+volumes:
+  mysql_data:
+  uploads_data:
+
+networks:
+  gesdoc-net:
+    driver: bridge
