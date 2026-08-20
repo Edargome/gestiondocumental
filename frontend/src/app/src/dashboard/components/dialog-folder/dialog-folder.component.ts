@@ -27,9 +27,8 @@ export class DialogFolderComponent {
     const name: string = this.folderDisplay.get('folderNameControl')?.value;
     const desc: string = this.folderDisplay.get('folderDescControl')?.value;
     const parent_folder_id: number = this.folder_id;
-    this.folderService
-      .createFolder(parent_folder_id, name, desc)
-      .subscribe((response) => {
+    this.folderService.createFolder(parent_folder_id, name, desc).subscribe({
+      next: (response) => {
         if (response.folder_id > 0) {
           this.folderService.getRootTree();
           // Realizas el reset del formulario
@@ -41,7 +40,11 @@ export class DialogFolderComponent {
         } else {
           this.toast.error(response.error);
         }
-      });
+      },
+      error: (error) => {
+        this.toast.error(error.error?.error ?? 'Error al crear la carpeta.');
+      },
+    });
   }
 
   onNoClick(): void {

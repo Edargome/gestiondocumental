@@ -8,6 +8,7 @@ const {
   updateFileMetadata,
   updateFileData,
   getFile,
+  getFileIdentity,
   getVersions,
   getFileActive,
   getFileVersion,
@@ -360,6 +361,11 @@ const moveFileController = async (req, res) => {
     const targetFolder = await existFolder(target_folder_id);
     if (targetFolder.length === 0) {
       return res.status(400).send({ error: 'La carpeta destino no existe' });
+    }
+
+    const identity = await getFileIdentity(file_id);
+    if (identity && (await searchFileByFolder(identity.name, identity.extname, target_folder_id))) {
+      return res.status(409).send({ error: 'Ya existe un archivo con ese nombre en la carpeta destino' });
     }
 
     await moveFile(file_id, target_folder_id, user_id);

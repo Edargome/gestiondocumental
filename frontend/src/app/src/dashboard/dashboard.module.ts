@@ -30,6 +30,7 @@ import { DialogEditFolderComponent } from './components/dialog-edit-folder/dialo
 import { DialogMoveComponent } from './components/dialog-move/dialog-move.component';
 import { TrashComponent } from './components/trash/trash.component';
 import { DialogRestoreComponent } from './components/dialog-restore/dialog-restore.component';
+import { DialogSearchComponent } from './components/dialog-search/dialog-search.component';
 
 @NgModule({
   declarations: [
@@ -47,6 +48,7 @@ import { DialogRestoreComponent } from './components/dialog-restore/dialog-resto
     DialogMoveComponent,
     TrashComponent,
     DialogRestoreComponent,
+    DialogSearchComponent,
   ],
   imports: [
     CommonModule,

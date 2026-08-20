@@ -1,8 +1,10 @@
 const {
   createFolder,
   existFolder,
+  existsFolderName,
   listFolderByIdFolder,
   getPath,
+  searchByName,
   deleteLogic,
   updateFolder,
   moveFolder,
@@ -35,6 +37,9 @@ const create = async (req, res) => {
     if (!isAtLeast(level, ROLES.EDITOR)) {
       return res.status(403).send({ error: 'No tienes permiso para escribir en esta carpeta' });
     }
+    if (await existsFolderName(name, parent_folder_id)) {
+      return res.status(409).send({ error: 'Ya existe una carpeta con ese nombre en este directorio' });
+    }
     const result = await createFolder(name, parent_folder_id, user_id, desc);
     const folder_id = result.insertId;
     await createPermission(user_id, folder_id, null, 1, 1, 1);
@@ -49,11 +54,13 @@ const update_folder = async (req, res) => {
   const user_id = req.user_id;
   const level = req.accessLevel;
   try {
+    let currentFolder = null;
     if (folder_id != null) {
-      const parentFolder = await existFolder(folder_id);
-      if (parentFolder.length === 0) {
+      const rows = await existFolder(folder_id);
+      if (rows.length === 0) {
         return res.status(400).send({ error: 'La carpeta padre no existe' });
       }
+      currentFolder = rows[0];
     }
     // Verificar si el usuario tiene permiso de escritura
     // const hasPermission = await hasWritePermissionFolder(user_id, parent_folder_id);
@@ -62,6 +69,9 @@ const update_folder = async (req, res) => {
     // }
     if (!isAtLeast(level, ROLES.EDITOR)) {
       return res.status(403).send({ error: 'No tienes permiso para escribir en esta carpeta' });
+    }
+    if (await existsFolderName(name, currentFolder.parent_folder_id, folder_id)) {
+      return res.status(409).send({ error: 'Ya existe una carpeta con ese nombre en este directorio' });
     }
     await updateFolder(name, folder_id, user_id, desc);
     res.status(200).send({ message: 'Carpeta actualizada con éxito', folder_id });
@@ -162,6 +172,20 @@ const getFolderPath = async (req, res) => {
   }
 };
 
+const searchController = async (req, res) => {
+  const term = (req.query.q || '').trim();
+  if (!term) {
+    return res.status(400).send({ error: 'El término de búsqueda es requerido' });
+  }
+  try {
+    const results = await searchByName(term);
+    res.status(200).send({ results });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error: 'Error al buscar' });
+  }
+};
+
 const hasReadPermissionFolder = async (user_id, folder_id) => {
   const permissions = await canReadFolder(user_id, folder_id);
   return permissions.length > 0 && permissions[0].can_read === 1;
@@ -188,6 +212,11 @@ const moveFolderController = async (req, res) => {
       return res.status(400).send({ error: 'No puedes mover una carpeta a sí misma' });
     }
 
+    const folderRows = await existFolder(folder_id);
+    if (folderRows.length === 0) {
+      return res.status(400).send({ error: 'La carpeta no existe' });
+    }
+
     const targetFolder = await existFolder(target_folder_id);
     if (targetFolder.length === 0) {
       return res.status(400).send({ error: 'La carpeta destino no existe' });
@@ -197,6 +226,10 @@ const moveFolderController = async (req, res) => {
     const descendantIds = await getDescendantIds(folder_id);
     if (descendantIds.includes(parseInt(target_folder_id))) {
       return res.status(400).send({ error: 'No puedes mover una carpeta a una de sus subcarpetas' });
+    }
+
+    if (await existsFolderName(folderRows[0].name, target_folder_id, folder_id)) {
+      return res.status(409).send({ error: 'Ya existe una carpeta con ese nombre en el destino' });
     }
 
     await moveFolder(folder_id, target_folder_id, user_id);
@@ -212,6 +245,7 @@ module.exports = {
   listFolderContents,
   getFolderTreeController,
   getFolderPath,
+  searchController,
   deleteFolder,
   update_folder,
   moveFolderController,

@@ -9,6 +9,7 @@ import {
   Path,
 } from '../interfaces/node-tree';
 import { ContentFolder } from '../interfaces/content-folder';
+import { SearchResult } from '../interfaces/search-result';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -83,5 +84,13 @@ export class FolderService {
     return this.http.patch<any>(`${this.apiUrl}/files/${file_id}/move`, {
       target_folder_id,
     });
+  }
+
+  search(term: string): Observable<SearchResult[]> {
+    return this.http
+      .get<{ results: SearchResult[] }>(`${this.apiUrl}/folders/search`, {
+        params: { q: term },
+      })
+      .pipe(map((result) => result.results));
   }
 }

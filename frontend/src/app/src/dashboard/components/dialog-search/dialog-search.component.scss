@@ -1,0 +1,23 @@
+table {
+  width: 100%;
+}
+
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  padding: 16px 0;
+}
+
+.empty-state {
+  text-align: center;
+  opacity: 0.7;
+  padding: 16px 0;
+}
+
+.result-row {
+  cursor: pointer;
+}
+
+.result-row:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}

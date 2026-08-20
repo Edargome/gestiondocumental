@@ -267,6 +267,31 @@ async function getFileVersion(file_id, version) {
   }
 }
 
+async function getFileIdentity(file_id) {
+  try {
+    return await new Promise((resolve, reject) => {
+      pool.getConnection((err, connection) => {
+        if (err) {
+          return reject(err);
+        }
+        connection.query(
+          'SELECT name, extname FROM files WHERE file_id = ? AND isDelete = 0',
+          [file_id],
+          (error, rows) => {
+            connection.release();
+            if (error) {
+              return reject(error);
+            }
+            resolve(rows[0] || null);
+          }
+        );
+      });
+    });
+  } catch (error) {
+    throw error;
+  }
+}
+
 async function searchFileByFolder(name, extname, folder_id) {
   try {
     return await new Promise((resolve, reject) => {
@@ -400,6 +425,7 @@ module.exports = {
   updateFileMetadata,
   updateFileData,
   getFile,
+  getFileIdentity,
   getVersions,
   listFileByIdFolder,
   getFileActive,

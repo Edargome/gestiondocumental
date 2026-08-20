@@ -29,9 +29,8 @@ export class DialogEditFolderComponent {
     const name: string = this.folderDisplay.get('folderNameControl')?.value;
     const desc: string = this.folderDisplay.get('folderDescControl')?.value;
     const folder_id: number = this.folder.id;
-    this.folderService
-      .updateFolder(folder_id, name, desc)
-      .subscribe((response) => {
+    this.folderService.updateFolder(folder_id, name, desc).subscribe({
+      next: (response) => {
         if (response.message) {
           this.toast.success(response.message);
           this.folderService.getRootTree();
@@ -47,7 +46,11 @@ export class DialogEditFolderComponent {
         } else {
           this.toast.error(response.error);
         }
-      });
+      },
+      error: (error) => {
+        this.toast.error(error.error?.error ?? 'Error al actualizar la carpeta.');
+      },
+    });
   }
 
   onNoClick(): void {

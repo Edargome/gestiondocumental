@@ -29,6 +29,9 @@
         align-items: center;
       "
     >
+      <a (click)="openSearchDialog()"
+        ><mat-icon>search</mat-icon> Buscar</a
+      >
       <a *ngIf="accessLevel != null && accessLevel <= '3'" (click)="openDialogFolder()"
         ><mat-icon>create_new_folder</mat-icon> Nueva carpeta</a
       >

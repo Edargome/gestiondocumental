@@ -57,7 +57,7 @@ async function existFolder(parent_folder_id) {
           return reject(err);
         }
         connection.query(
-          'SELECT folder_id FROM folders WHERE folder_id = ? AND isDelete=0',
+          'SELECT folder_id, name, parent_folder_id FROM folders WHERE folder_id = ? AND isDelete=0',
           [parent_folder_id],
           (error, rows) => {
             connection.release(); // Liberar la conexión de vuelta al pool
@@ -65,6 +65,32 @@ async function existFolder(parent_folder_id) {
               return reject(error);
             }
             resolve(rows);
+          }
+        );
+      });
+    });
+  } catch (error) {
+    throw error;
+  }
+}
+
+// parent_folder_id se compara con <=> (NULL-safe) porque la raíz tiene parent_folder_id IS NULL.
+async function existsFolderName(name, parent_folder_id, excludeFolderId = null) {
+  try {
+    return await new Promise((resolve, reject) => {
+      pool.getConnection((err, connection) => {
+        if (err) {
+          return reject(err);
+        }
+        connection.query(
+          'SELECT folder_id FROM folders WHERE name = ? AND parent_folder_id <=> ? AND isDelete = 0 AND folder_id != ?',
+          [name, parent_folder_id, excludeFolderId || 0],
+          (error, rows) => {
+            connection.release();
+            if (error) {
+              return reject(error);
+            }
+            resolve(rows.length > 0);
           }
         );
       });
@@ -115,6 +141,49 @@ async function getPath(folder_id) {
           [folder_id],
           (error, rows) => {
             connection.release(); // Liberar la conexión de vuelta al pool
+            if (error) {
+              return reject(error);
+            }
+            resolve(rows);
+          }
+        );
+      });
+    });
+  } catch (error) {
+    throw error;
+  }
+}
+
+// target_folder_id unifica la navegación en el frontend: para una carpeta es ella misma,
+// para un archivo es su carpeta contenedora. El CAST en el ancla de la CTE evita que MySQL
+// trunque `path` al ancho de folders.name (VARCHAR(100)) en recursiones profundas.
+async function searchByName(term) {
+  try {
+    return await new Promise((resolve, reject) => {
+      pool.getConnection((err, connection) => {
+        if (err) {
+          return reject(err);
+        }
+        connection.query(
+          `WITH RECURSIVE folder_paths AS (
+            SELECT folder_id, name, parent_folder_id, updated_at, CAST(name AS CHAR(2000)) COLLATE utf8mb4_0900_ai_ci AS path
+            FROM folders WHERE parent_folder_id IS NULL AND isDelete = 0
+            UNION ALL
+            SELECT f.folder_id, f.name, f.parent_folder_id, f.updated_at, CONCAT(fp.path, ' / ', f.name)
+            FROM folders f JOIN folder_paths fp ON f.parent_folder_id = fp.folder_id
+            WHERE f.isDelete = 0
+          )
+          SELECT folder_id AS id, name, path, updated_at, 'folder' AS type, folder_id AS target_folder_id
+          FROM folder_paths WHERE name LIKE CONCAT('%', ?, '%')
+          UNION ALL
+          SELECT fi.file_id AS id, fi.name, CONCAT(fp.path, ' / ', fi.name) AS path, fi.updated_at, 'file' AS type, fi.folder_id AS target_folder_id
+          FROM files fi JOIN folder_paths fp ON fi.folder_id = fp.folder_id
+          WHERE fi.isDelete = 0 AND fi.name LIKE CONCAT('%', ?, '%')
+          ORDER BY type, name
+          LIMIT 50`,
+          [term, term],
+          (error, rows) => {
+            connection.release();
             if (error) {
               return reject(error);
             }
@@ -214,8 +283,10 @@ async function getDescendantIds(folder_id) {
 module.exports = {
   createFolder,
   existFolder,
+  existsFolderName,
   listFolderByIdFolder,
   getPath,
+  searchByName,
   deleteLogic,
   updateFolder,
   moveFolder,

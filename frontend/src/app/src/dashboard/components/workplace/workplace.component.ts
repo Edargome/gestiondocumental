@@ -18,6 +18,7 @@ import {
   DialogUpdateFileComponent,
 } from '../dialog-update-file/dialog-update-file.component';
 import { DialogPermissionsComponent } from '../dialog-permissions/dialog-permissions.component';
+import { DialogSearchComponent } from '../dialog-search/dialog-search.component';
 import { DialogDeleteFileComponent } from '../dialog-delete-file/dialog-delete-file.component';
 import { FolderPath } from 'src/app/src/interfaces/node-tree';
 import { DialogEditFolderComponent } from '../dialog-edit-folder/dialog-edit-folder.component';
@@ -129,6 +130,9 @@ export class WorkplaceComponent implements OnInit, AfterViewInit {
       data: this.parent_folder_id,
     });
   }
+  openSearchDialog(): void {
+    this.dialog.open(DialogSearchComponent, { width: '600px' });
+  }
   openDialogUpdateFile(file_id: number): void {
     const data: DataUpdate = {
       file_id,
@@ -211,7 +215,9 @@ export class WorkplaceComponent implements OnInit, AfterViewInit {
         this.folderService.getContentFolder(this.parent_folder_id);
         this.folderService.getRootTree();
       } else if (result?.error) {
-        this.toast.error('Error al mover el elemento');
+        this.toast.error(
+          result.error?.error?.error ?? 'Error al mover el elemento'
+        );
       }
     });
   }

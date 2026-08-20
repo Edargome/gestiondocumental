@@ -1,0 +1,72 @@
+<h2 mat-dialog-title>Buscar carpeta o documento</h2>
+
+<mat-dialog-content>
+  <mat-form-field appearance="outline" style="width: 100%">
+    <mat-label>Nombre</mat-label>
+    <input
+      matInput
+      [(ngModel)]="term"
+      (ngModelChange)="onTermChange($event)"
+      placeholder="Escribe al menos 2 caracteres"
+      autocomplete="off"
+    />
+    <mat-icon matSuffix>search</mat-icon>
+  </mat-form-field>
+
+  <div *ngIf="isLoading" class="spinner-container">
+    <mat-progress-spinner
+      color="primary"
+      mode="indeterminate"
+      diameter="32"
+    ></mat-progress-spinner>
+  </div>
+
+  <table
+    *ngIf="!isLoading && results.length > 0"
+    mat-table
+    [dataSource]="results"
+    class="mat-elevation-z1"
+  >
+    <ng-container matColumnDef="type">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let row">
+        <mat-icon [color]="row.type === 'folder' ? 'accent' : 'primary'">{{
+          row.type === 'folder' ? 'folder' : 'task'
+        }}</mat-icon>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef>Nombre</th>
+      <td mat-cell *matCellDef="let row">{{ row.name }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="path">
+      <th mat-header-cell *matHeaderCellDef>Ruta</th>
+      <td mat-cell *matCellDef="let row">{{ row.path }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="updated_at">
+      <th mat-header-cell *matHeaderCellDef>Última modificación</th>
+      <td mat-cell *matCellDef="let row">
+        {{ row.updated_at | date: 'dd/MM/yyyy HH:mm' }}
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr
+      mat-row
+      *matRowDef="let row; columns: displayedColumns"
+      class="result-row"
+      (click)="selectResult(row)"
+    ></tr>
+  </table>
+
+  <p *ngIf="!isLoading && searched && results.length === 0" class="empty-state">
+    No se encontraron resultados para "{{ term }}".
+  </p>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onNoClick()" type="button">Cerrar</button>
+</mat-dialog-actions>
