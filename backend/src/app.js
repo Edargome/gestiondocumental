@@ -11,7 +11,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ limit: '50mb' }));
 app.use(
   cors({
-    origin: '*', //servidor que deseas que consuma o (*) en caso que sea acceso libre
+    origin: process.env.CORS_ORIGIN || 'https://gesdoc.intekgrow.com', //servidor que deseas que consuma o (*) en caso que sea acceso libre
     credentials: false,
   })
 );

@@ -1,0 +1,103 @@
+<div *ngIf="isLoading" class="spinner-container">
+  <mat-progress-spinner color="primary" mode="indeterminate"></mat-progress-spinner>
+</div>
+
+<div *ngIf="!isLoading">
+  <nav
+    style="
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      padding: 8px 0;
+      gap: 8px;
+      flex-wrap: wrap;
+    "
+  >
+    <mat-icon color="primary">group</mat-icon>
+    <h2 style="margin: 0">Administración de usuarios</h2>
+    <span style="flex: 1 1 auto"></span>
+    <mat-form-field appearance="outline" style="width: 220px">
+      <mat-label>Buscar</mat-label>
+      <input
+        matInput
+        [(ngModel)]="search"
+        (keyup.enter)="loadUsers()"
+        placeholder="Usuario o email"
+      />
+    </mat-form-field>
+    <mat-slide-toggle [(ngModel)]="onlyActive" (change)="loadUsers()">
+      Solo activos
+    </mat-slide-toggle>
+    <button mat-raised-button color="primary" (click)="openCreateDialog()">
+      <mat-icon>person_add</mat-icon> Nuevo usuario
+    </button>
+  </nav>
+
+  <section>
+    <div class="mat-elevation-z8">
+      <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+        <ng-container matColumnDef="username">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Usuario</th>
+          <td mat-cell *matCellDef="let row">{{ row.username }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="email">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Email</th>
+          <td mat-cell *matCellDef="let row">{{ row.email }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="accessLevel">
+          <th mat-header-cell *matHeaderCellDef>Rol</th>
+          <td mat-cell *matCellDef="let row">
+            <mat-form-field appearance="outline" style="width: 170px">
+              <mat-select
+                [value]="row.accessLevel"
+                (selectionChange)="changeRole(row, $event.value)"
+              >
+                <mat-option *ngFor="let role of roleOptions" [value]="role.value">
+                  {{ role.label }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="isActive">
+          <th mat-header-cell *matHeaderCellDef>Estado</th>
+          <td mat-cell *matCellDef="let row">
+            <mat-slide-toggle
+              [checked]="row.isActive"
+              (change)="toggleActive(row)"
+              [matTooltip]="row.isActive ? 'Desactivar' : 'Activar'"
+            ></mat-slide-toggle>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Acciones</th>
+          <td mat-cell *matCellDef="let row">
+            <button mat-icon-button matTooltip="Editar" (click)="openEditDialog(row)">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              matTooltip="Restablecer contraseña"
+              (click)="openResetPasswordDialog(row)"
+            >
+              <mat-icon>key</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell" [attr.colspan]="displayedColumns.length" style="text-align: center; padding: 24px">
+            No hay usuarios que coincidan con el filtro.
+          </td>
+        </tr>
+      </table>
+    </div>
+  </section>
+</div>

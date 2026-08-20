@@ -9,9 +9,9 @@ services:
       MYSQL_USER: ${DBUSER:-gesdoc}
       MYSQL_PASSWORD: ${DBPWD:-gesdocpwd}
     ports:
-      - "${DB_PORT:-3306}:3306"
+      - "${DB_PORT:-3309}:3306"
     volumes:
-      - mysql_data:/var/lib/mysql
+      - mysql_data_ges:/var/lib/mysql
       - ./init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PWD:-rootpwd}"]
@@ -31,14 +31,17 @@ services:
         condition: service_healthy
     environment:
       PROD: "true"
+      PORT: "8000"
       DBHOST: mysql
       DBUSER: ${DBUSER:-gesdoc}
       DBPWD: ${DBPWD:-gesdocpwd}
       DBNAME: ${DBNAME:-gestiondocumental}
+      SECRET: ${SECRET:?La variable SECRET es requerida para firmar los JWT}
+      CORS_ORIGIN: ${CORS_ORIGIN:-https://gesdoc.intekgrow.com}
     ports:
       - "${BACKEND_PORT:-8000}:8000"
     volumes:
-      - uploads_data:/app/uploads
+      - uploads_data_ges:/app/uploads
     networks:
       - gesdoc-net
 
@@ -54,8 +57,8 @@ services:
       - gesdoc-net
 
 volumes:
-  mysql_data:
-  uploads_data:
+  mysql_data_ges:
+  uploads_data_ges:
 
 networks:
   gesdoc-net:

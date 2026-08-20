@@ -4,10 +4,11 @@ const {
   restoreFile,
   restoreFolder,
 } = require('../services/trash.service');
+const { ROLES, isAtLeast } = require('../utils/roles');
 
 const getTrash = async (req, res) => {
   const level = req.accessLevel;
-  if (level > 2) {
+  if (!isAtLeast(level, ROLES.GESTOR)) {
     return res.status(403).send({ error: 'No tienes permiso para acceder a la papelera' });
   }
   try {
@@ -22,7 +23,7 @@ const getTrash = async (req, res) => {
 const restoreFileController = async (req, res) => {
   const level = req.accessLevel;
   const user_id = req.user_id;
-  if (level > 2) {
+  if (!isAtLeast(level, ROLES.GESTOR)) {
     return res.status(403).send({ error: 'No tienes permiso para restaurar archivos' });
   }
   const { file_id } = req.params;
@@ -37,7 +38,7 @@ const restoreFileController = async (req, res) => {
 const restoreFolderController = async (req, res) => {
   const level = req.accessLevel;
   const user_id = req.user_id;
-  if (level > 2) {
+  if (!isAtLeast(level, ROLES.GESTOR)) {
     return res.status(403).send({ error: 'No tienes permiso para restaurar carpetas' });
   }
   const { folder_id } = req.params;

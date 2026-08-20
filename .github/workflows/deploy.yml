@@ -1,0 +1,29 @@
+name: Deploy App
+on:
+  push:
+    branches: [ "main" ] # Cambiar si la rama es diferente
+
+jobs:
+  deploy:
+    runs-on: self-hosted # Indica que use NUESTRO servidor
+    steps:
+      - uses: actions/checkout@v4 # Descarga el código
+
+      - name: Inject Secrets
+        run: |
+          if [ -z "${{ secrets.ENV_FILE }}" ]; then
+            echo "::error::El secret ENV_FILE no está configurado en el repositorio (Settings > Secrets and variables > Actions)."
+            exit 1
+          fi
+          echo "${{ secrets.ENV_FILE }}" > .env
+
+      - name: Validate Config
+        run: docker compose config -q
+
+      - name: Docker Run
+        run: |
+          docker compose build
+          docker compose up -d --remove-orphans
+          
+      - name: Security Cleanup
+        run: docker image prune -f

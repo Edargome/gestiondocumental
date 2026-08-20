@@ -11,6 +11,7 @@ import { ThemeService } from '../../../services/theme.service';
 export class HeaderComponent {
   readonly isDark$: Observable<boolean>;
   readonly accessLevel: string | null = localStorage.getItem('level');
+  readonly isAdmin: boolean = this.accessLevel === '0';
   showTrash = false;
 
   @Output() trashToggled = new EventEmitter<boolean>();
@@ -26,6 +27,10 @@ export class HeaderComponent {
   toggleTrash(): void {
     this.showTrash = !this.showTrash;
     this.trashToggled.emit(this.showTrash);
+  }
+
+  goToUsers(): void {
+    this.router.navigate(['/admin/usuarios']);
   }
 
   logout(): void {

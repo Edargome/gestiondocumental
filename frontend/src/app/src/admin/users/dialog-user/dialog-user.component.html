@@ -1,0 +1,50 @@
+<div mat-dialog-content>
+  <div
+    class="header"
+    style="
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    "
+  >
+    <p>{{ isEdit ? 'Editar usuario' : 'Nuevo usuario' }}</p>
+    <a (click)="onNoClick()" style="color: red">
+      <mat-icon>highlight_off</mat-icon>
+    </a>
+  </div>
+  <form [formGroup]="form" class="formContent">
+    <mat-form-field appearance="outline">
+      <mat-label>Usuario</mat-label>
+      <input type="text" matInput formControlName="username" />
+      <mat-error style="font-size: small">El usuario es requerido</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Email</mat-label>
+      <input type="email" matInput formControlName="email" />
+      <mat-error style="font-size: small">Ingresa un email válido</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" *ngIf="!isEdit">
+      <mat-label>Contraseña</mat-label>
+      <input type="password" matInput formControlName="password" />
+      <mat-error style="font-size: small">Mínimo 8 caracteres</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" *ngIf="!isEdit">
+      <mat-label>Rol</mat-label>
+      <mat-select formControlName="accessLevel">
+        <mat-option *ngFor="let role of roleOptions" [value]="role.value">
+          {{ role.label }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <button mat-stroked-button color="primary" [disabled]="form.invalid" (click)="save()">
+      Guardar &nbsp;
+      <mat-icon>save</mat-icon>
+    </button>
+  </form>
+</div>

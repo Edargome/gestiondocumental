@@ -1,4 +1,4 @@
-const mysql = require('mysql');
+const mysql = require('mysql2');
 const pool = createPool(process.env.PROD === 'true');
 pool.on('connection', (connection) => {
   console.log('Nueva conexión establecida');

@@ -35,11 +35,15 @@ export class LoginComponent {
         const token: string = result.data?.token?.toString()!;
         localStorage.setItem('token', token);
         const payloadBase64 = token.split('.')[1]; // Obtener la parte del payload
-        const decodedPayload = atob(
-          payloadBase64.replace(/-/g, '+').replace(/_/g, '/')
+        const decodedPayload = JSON.parse(
+          atob(payloadBase64.replace(/-/g, '+').replace(/_/g, '/'))
         ); // Decodificar Base64Url
-        localStorage.setItem('level', JSON.parse(decodedPayload).accessLevel);
-        this.router.navigate(['/']);
+        localStorage.setItem('level', decodedPayload.accessLevel);
+        if (decodedPayload.must_change_password) {
+          this.router.navigate(['/admin/cambiar-password']);
+        } else {
+          this.router.navigate(['/']);
+        }
       } else {
         this.openSnackBar(result.error?.toString()!);
       }

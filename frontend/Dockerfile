@@ -15,7 +15,7 @@ COPY . .
 
 # Compila la aplicación Angular
 # RUN npm run build -- --prod
-RUN npm run build --
+RUN npm run build --prod
 
 # Usa una imagen de servidor web para servir la aplicación compilada
 FROM nginx:alpine
@@ -28,7 +28,7 @@ COPY nginx.conf /etc/nginx/nginx.conf
 COPY --from=build /app/dist/frontend /usr/share/nginx/html
 
 # Expone el puerto en el que Nginx sirve la aplicación
-EXPOSE 80
+EXPOSE 4200
 
 # Inicia Nginx
 CMD ["nginx", "-g", "daemon off;"]

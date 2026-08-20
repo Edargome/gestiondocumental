@@ -14,6 +14,7 @@ const {
   canWriteFolder,
   createPermission,
 } = require('../services/permission.service');
+const { ROLES, isAtLeast } = require('../utils/roles');
 
 const create = async (req, res) => {
   const { name, parent_folder_id } = req.body;
@@ -31,7 +32,7 @@ const create = async (req, res) => {
     // if (!hasPermission) {
     //   return res.status(403).send({ error: 'No tienes permiso para escribir en esta carpeta' });
     // }
-    if (level > 3) {
+    if (!isAtLeast(level, ROLES.EDITOR)) {
       return res.status(403).send({ error: 'No tienes permiso para escribir en esta carpeta' });
     }
     const result = await createFolder(name, parent_folder_id, user_id);
@@ -59,7 +60,7 @@ const update_folder = async (req, res) => {
     // if (!hasPermission) {
     //   return res.status(403).send({ error: 'No tienes permiso para escribir en esta carpeta' });
     // }
-    if (level > 3) {
+    if (!isAtLeast(level, ROLES.EDITOR)) {
       return res.status(403).send({ error: 'No tienes permiso para escribir en esta carpeta' });
     }
     const result = await updateFolder(name, folder_id, user_id);
@@ -81,7 +82,7 @@ const deleteFolder = async (req, res) => {
         return res.status(400).send({ error: 'La carpeta padre no existe' });
       }
     }
-    if (level > 3) {
+    if (!isAtLeast(level, ROLES.EDITOR)) {
       return res.status(403).send({ error: 'No tienes permiso para escribir en esta carpeta' });
     }
     const folders = await listFolderByIdFolder(folder_id);
@@ -180,7 +181,7 @@ const moveFolderController = async (req, res) => {
   const user_id = req.user_id;
   const level = req.accessLevel;
   try {
-    if (level > 3) {
+    if (!isAtLeast(level, ROLES.EDITOR)) {
       return res.status(403).send({ error: 'No tienes permiso para mover esta carpeta' });
     }
 

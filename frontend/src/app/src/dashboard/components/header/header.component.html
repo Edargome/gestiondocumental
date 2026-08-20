@@ -22,6 +22,16 @@
     <mat-icon>{{ showTrash ? 'delete_sweep' : 'delete_sweep' }}</mat-icon>
   </button>
 
+  <button
+    *ngIf="isAdmin"
+    mat-icon-button
+    aria-label="Administración de usuarios"
+    matTooltip="Administración de usuarios"
+    (click)="goToUsers()"
+  >
+    <mat-icon>group</mat-icon>
+  </button>
+
   <button mat-icon-button aria-label="Salir" (click)="logout()">
     <mat-icon>logout</mat-icon>
   </button>
