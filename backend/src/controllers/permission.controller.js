@@ -6,11 +6,13 @@ const {
   createPermission,
   updatePermission,
 } = require('../services/permission.service');
+const { ROLES } = require('../utils/roles');
 
 const getPermissionByUser = async (req, res) => {
   const file_id = req.params.file_id;
   const user_id = req.user_id;
-  const hasPermission = await hasWritePermission(user_id, file_id);
+  const level = req.accessLevel;
+  const hasPermission = await hasWritePermission(user_id, file_id, level);
   if (!hasPermission) {
     return res.status(403).send({ error: 'No tienes permiso para editar a este archivo' });
   }
@@ -20,8 +22,9 @@ const getPermissionByUser = async (req, res) => {
 const setPermissionByUser = async (req, res) => {
   const file_id = req.params.file_id;
   const user_permissions = req.user_id;
+  const level = req.accessLevel;
   const { user_id, can_read, can_write, can_delete } = req.body;
-  const hasPermission = await hasWritePermission(user_permissions, file_id);
+  const hasPermission = await hasWritePermission(user_permissions, file_id, level);
   if (!hasPermission) {
     return res.status(403).send({ error: 'No tienes permiso para editar a este archivo' });
   }
@@ -34,7 +37,11 @@ const setPermissionByUser = async (req, res) => {
   const rows = await createPermission(user_id, null, file_id, can_read, can_write, can_delete);
   res.status(200).send(rows);
 };
-const hasWritePermission = async (user_id, file_id) => {
+// ADMIN bypasea la ACL de archivos, igual que en file.controller.js.
+const hasWritePermission = async (user_id, file_id, level) => {
+  if (level === ROLES.ADMIN) {
+    return true;
+  }
   const permissions = await canWrite(user_id, file_id);
   return permissions.length > 0 && permissions[0].can_write === 1;
 };

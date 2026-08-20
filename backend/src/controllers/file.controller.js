@@ -25,6 +25,7 @@ const {
   canDelete,
 } = require('../services/permission.service');
 const { search } = require('../routes/folder.routes');
+const { ROLES, isAtLeast } = require('../utils/roles');
 
 // multer/busboy decodifica el nombre del archivo como latin1 aunque el navegador
 // lo envía en UTF-8, corrompiendo tildes/ñ (ej: "Política" -> "PolÃ­tica").
@@ -35,9 +36,13 @@ const fixOriginalNameEncoding = (originalname) =>
 const uploadFile = async (req, res) => {
   const { folder_id } = req.body;
   const user_id = req.user_id;
+  const level = req.accessLevel;
   const file = req.file;
   console.log(file);
   try {
+    if (!isAtLeast(level, ROLES.EDITOR)) {
+      return res.status(403).send({ error: 'No tienes permiso para escribir en esta carpeta' });
+    }
     if (!file) {
       return res.status(400).send('No se subió ningún archivo.');
     }
@@ -80,8 +85,12 @@ const updateFile = async (req, res) => {
   const file_id = req.params.id_file;
   const { folder_id } = req.body;
   const user_id = req.user_id;
+  const level = req.accessLevel;
   try {
-    const hasPermission = await hasWritePermission(user_id, file_id);
+    if (!isAtLeast(level, ROLES.EDITOR)) {
+      return res.status(403).send({ error: 'No tienes permiso para escribir en esta carpeta' });
+    }
+    const hasPermission = await hasWritePermission(user_id, file_id, level);
     if (!hasPermission) {
       return res.status(403).send({ error: 'No tienes permiso para acceder a este archivo' });
     }
@@ -121,9 +130,10 @@ const updateFile = async (req, res) => {
 const getFileMetadataAndVersions = async (req, res) => {
   const { file_id } = req.params;
   const user_id = req.user_id;
+  const level = req.accessLevel;
   try {
     // Verificar si el usuario tiene permiso de escritura
-    const hasPermission = await hasReadPermission(user_id, file_id);
+    const hasPermission = await hasReadPermission(user_id, file_id, level);
     if (!hasPermission) {
       return res.status(403).send({ error: 'No tienes permiso para acceder a este archivo' });
     }
@@ -145,9 +155,10 @@ const getFileMetadataAndVersions = async (req, res) => {
 const downloadFile = async (req, res) => {
   const { file_id } = req.params;
   const user_id = req.user_id;
+  const level = req.accessLevel;
   try {
     // Verificar si el usuario tiene permiso de lectura
-    const hasPermission = await hasReadPermission(user_id, file_id);
+    const hasPermission = await hasReadPermission(user_id, file_id, level);
     if (!hasPermission) {
       return res.status(403).send({ error: 'No tienes permiso para acceder a este archivo' });
     }
@@ -191,9 +202,10 @@ const downloadFile = async (req, res) => {
 const downloadFileVersion = async (req, res) => {
   const { file_id, version } = req.params;
   const user_id = req.user_id;
+  const level = req.accessLevel;
   try {
     // Verificar si el usuario tiene permiso de lectura
-    const hasPermission = await hasReadPermission(user_id, file_id);
+    const hasPermission = await hasReadPermission(user_id, file_id, level);
     if (!hasPermission) {
       return res.status(403).send({ error: 'No tienes permiso para acceder a este archivo' });
     }
@@ -237,9 +249,10 @@ const downloadFileVersion = async (req, res) => {
 const viewFile = async (req, res) => {
   const { file_id } = req.params;
   const user_id = req.user_id;
+  const level = req.accessLevel;
   try {
     // Verificar si el usuario tiene permiso de lectura
-    const hasPermission = await hasReadPermission(user_id, file_id);
+    const hasPermission = await hasReadPermission(user_id, file_id, level);
     if (!hasPermission) {
       return res.status(403).send({ error: 'No tienes permiso para acceder a este archivo' });
     }
@@ -274,9 +287,10 @@ const viewFile = async (req, res) => {
 const getHistoryFile = async (req, res) => {
   const { file_id } = req.params;
   const user_id = req.user_id;
+  const level = req.accessLevel;
   try {
     // Verificar si el usuario tiene permiso de escritura
-    const hasPermission = await hasReadPermission(user_id, file_id);
+    const hasPermission = await hasReadPermission(user_id, file_id, level);
     if (!hasPermission) {
       return res.status(403).send({ error: 'No tienes permiso para acceder a este archivo' });
     }
@@ -293,8 +307,9 @@ const getHistoryFile = async (req, res) => {
 const deleteFile = async (req, res) => {
   const file_id = req.params.file_id;
   const user_id = req.user_id;
+  const level = req.accessLevel;
   try {
-    const hasPermission = await hasDeletePermission(user_id, file_id);
+    const hasPermission = await hasDeletePermission(user_id, file_id, level);
     if (!hasPermission) {
       return res.status(403).send({ error: 'No tienes permiso para borrar a este archivo' });
     }
@@ -304,17 +319,27 @@ const deleteFile = async (req, res) => {
     res.status(500).send({ error: 'Error al borrar el archivo' });
   }
 };
-const hasReadPermission = async (user_id, file_id) => {
+// ADMIN bypasea la ACL de archivos: no depende de que el creador/otro usuario le comparta permiso.
+const hasReadPermission = async (user_id, file_id, level) => {
+  if (level === ROLES.ADMIN) {
+    return true;
+  }
   const permissions = await canRead(user_id, file_id);
   return permissions.length > 0 && permissions[0].can_read === 1;
 };
 
-const hasWritePermission = async (user_id, file_id) => {
+const hasWritePermission = async (user_id, file_id, level) => {
+  if (level === ROLES.ADMIN) {
+    return true;
+  }
   const permissions = await canWrite(user_id, file_id);
   return permissions.length > 0 && permissions[0].can_write === 1;
 };
 
-const hasDeletePermission = async (user_id, file_id) => {
+const hasDeletePermission = async (user_id, file_id, level) => {
+  if (level === ROLES.ADMIN) {
+    return true;
+  }
   const permissions = await canDelete(user_id, file_id);
   return permissions.length > 0 && permissions[0].can_delete === 1;
 };
@@ -323,7 +348,15 @@ const moveFileController = async (req, res) => {
   const { file_id } = req.params;
   const { target_folder_id } = req.body;
   const user_id = req.user_id;
+  const level = req.accessLevel;
   try {
+    if (!isAtLeast(level, ROLES.EDITOR)) {
+      return res.status(403).send({ error: 'No tienes permiso para mover este archivo' });
+    }
+    const hasPermission = await hasWritePermission(user_id, file_id, level);
+    if (!hasPermission) {
+      return res.status(403).send({ error: 'No tienes permiso para acceder a este archivo' });
+    }
     const targetFolder = await existFolder(target_folder_id);
     if (targetFolder.length === 0) {
       return res.status(400).send({ error: 'La carpeta destino no existe' });

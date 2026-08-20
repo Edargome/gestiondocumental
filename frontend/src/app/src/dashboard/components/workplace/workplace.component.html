@@ -29,10 +29,10 @@
         align-items: center;
       "
     >
-      <a (click)="openDialogFolder()"
+      <a *ngIf="accessLevel != null && accessLevel <= '3'" (click)="openDialogFolder()"
         ><mat-icon>create_new_folder</mat-icon> Nueva carpeta</a
       >
-      <a (click)="openDialogFile()"
+      <a *ngIf="accessLevel != null && accessLevel <= '3'" (click)="openDialogFile()"
         ><mat-icon>note_add</mat-icon> Nuevo documento</a
       >
     </div>
@@ -84,6 +84,7 @@
           <td mat-cell *matCellDef="let row">
             <div *ngIf="row.type == 'task'; else actionFolder">
               <button
+                *ngIf="accessLevel != null && accessLevel <= '3'"
                 matTooltip="Actualizar versión"
                 style="margin-right: 4px"
                 mat-mini-fab
@@ -111,6 +112,7 @@
                 <mat-icon>lock</mat-icon>
               </button>
               <button
+                *ngIf="accessLevel != null && accessLevel <= '3'"
                 matTooltip="Mover"
                 style="margin-right: 4px"
                 mat-mini-fab
