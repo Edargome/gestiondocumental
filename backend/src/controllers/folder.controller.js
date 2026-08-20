@@ -17,7 +17,7 @@ const {
 const { ROLES, isAtLeast } = require('../utils/roles');
 
 const create = async (req, res) => {
-  const { name, parent_folder_id } = req.body;
+  const { name, parent_folder_id, desc } = req.body;
   const user_id = req.user_id;
   const level = req.accessLevel;
   try {
@@ -35,7 +35,7 @@ const create = async (req, res) => {
     if (!isAtLeast(level, ROLES.EDITOR)) {
       return res.status(403).send({ error: 'No tienes permiso para escribir en esta carpeta' });
     }
-    const result = await createFolder(name, parent_folder_id, user_id);
+    const result = await createFolder(name, parent_folder_id, user_id, desc);
     const folder_id = result.insertId;
     await createPermission(user_id, folder_id, null, 1, 1, 1);
     res.status(200).send({ message: 'Carpeta creada con éxito', folder_id });
@@ -63,8 +63,7 @@ const update_folder = async (req, res) => {
     if (!isAtLeast(level, ROLES.EDITOR)) {
       return res.status(403).send({ error: 'No tienes permiso para escribir en esta carpeta' });
     }
-    const result = await updateFolder(name, folder_id, user_id);
-    console.log(result);
+    await updateFolder(name, folder_id, user_id, desc);
     res.status(200).send({ message: 'Carpeta actualizada con éxito', folder_id });
   } catch (error) {
     console.log(error);

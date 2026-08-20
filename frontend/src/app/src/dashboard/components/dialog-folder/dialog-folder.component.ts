@@ -25,9 +25,10 @@ export class DialogFolderComponent {
   }
   seveFolder() {
     const name: string = this.folderDisplay.get('folderNameControl')?.value;
+    const desc: string = this.folderDisplay.get('folderDescControl')?.value;
     const parent_folder_id: number = this.folder_id;
     this.folderService
-      .createFolder(parent_folder_id, name)
+      .createFolder(parent_folder_id, name, desc)
       .subscribe((response) => {
         if (response.folder_id > 0) {
           this.folderService.getRootTree();

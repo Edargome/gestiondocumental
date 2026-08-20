@@ -54,9 +54,10 @@ export class FolderService {
       });
   }
 
-  createFolder(parent_folder_id: number, name: string): Observable<any> {
+  createFolder(parent_folder_id: number, name: string, desc?: string): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/folders/create`, {
       name,
+      desc,
       parent_folder_id,
     });
   }

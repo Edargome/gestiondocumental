@@ -6,6 +6,7 @@ export interface ContentFolder {
 export interface FolterContent {
   id: number;
   name: string;
+  description?: string;
   created_at: Date;
   updated_at: Date;
   type: string;

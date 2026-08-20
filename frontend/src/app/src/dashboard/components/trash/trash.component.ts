@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { TrashService } from 'src/app/src/services/trash.service';
@@ -13,6 +13,8 @@ export class TrashComponent implements OnInit {
   displayedColumns: string[] = ['type', 'name', 'parent_folder', 'deleted_at', 'deleted_by', 'action'];
   dataSource = new MatTableDataSource<any>([]);
   isLoading = true;
+
+  @Output() exitTrash = new EventEmitter<void>();
 
   constructor(private trashService: TrashService, private dialog: MatDialog) {}
 

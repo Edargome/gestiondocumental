@@ -1,7 +1,6 @@
 const { pool } = require('../connections/mysql');
 
-async function createFolder(name, parent_folder_id, created_by) {
-  console.log(name, parent_folder_id, created_by);
+async function createFolder(name, parent_folder_id, created_by, description) {
   try {
     return await new Promise((resolve, reject) => {
       pool.getConnection((err, connection) => {
@@ -9,8 +8,8 @@ async function createFolder(name, parent_folder_id, created_by) {
           return reject(err);
         }
         connection.query(
-          'INSERT INTO folders (name, parent_folder_id, created_by, updated_by, created_at, updated_at) VALUES (?, ?, ?, ?, NOW(), NOW())',
-          [name, parent_folder_id, created_by, created_by],
+          'INSERT INTO folders (name, description, parent_folder_id, created_by, updated_by, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW())',
+          [name, description || null, parent_folder_id, created_by, created_by],
           (error, rows) => {
             connection.release(); // Liberar la conexión de vuelta al pool
             if (error) {
@@ -25,7 +24,7 @@ async function createFolder(name, parent_folder_id, created_by) {
     throw error;
   }
 }
-async function updateFolder(name, folder_id, updated_by) {
+async function updateFolder(name, folder_id, updated_by, description) {
   try {
     return await new Promise((resolve, reject) => {
       pool.getConnection((err, connection) => {
@@ -33,8 +32,8 @@ async function updateFolder(name, folder_id, updated_by) {
           return reject(err);
         }
         connection.query(
-          'UPDATE folders SET name=?, updated_by=?, updated_at = NOW() WHERE folder_id = ?',
-          [name, updated_by, folder_id],
+          'UPDATE folders SET name=?, description=?, updated_by=?, updated_at = NOW() WHERE folder_id = ?',
+          [name, description || null, updated_by, folder_id],
           (error, rows) => {
             connection.release(); // Liberar la conexión de vuelta al pool
             if (error) {
@@ -85,9 +84,9 @@ async function listFolderByIdFolder(folder_id) {
         let query = '';
         let filter = [];
         if (folder_id == null) {
-          query = `SELECT folder_id as id, name, created_at, updated_at, 'folder' as type FROM folders WHERE parent_folder_id is null AND isDelete=0`;
+          query = `SELECT folder_id as id, name, description, created_at, updated_at, 'folder' as type FROM folders WHERE parent_folder_id is null AND isDelete=0`;
         } else {
-          query = `SELECT folder_id as id, name, created_at, updated_at, 'folder' as type FROM folders WHERE parent_folder_id = ? AND isDelete=0`;
+          query = `SELECT folder_id as id, name, description, created_at, updated_at, 'folder' as type FROM folders WHERE parent_folder_id = ? AND isDelete=0`;
           filter = [folder_id];
         }
         connection.query(query, filter, (error, rows) => {

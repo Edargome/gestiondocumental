@@ -2,6 +2,7 @@ import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
 import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
 import { UserService } from '../../services/user.service';
 import { ToastService } from '../../services/toast.service';
 import { User } from '../../interfaces/user';
@@ -27,11 +28,16 @@ export class UsersComponent implements OnInit, AfterViewInit {
   constructor(
     private userService: UserService,
     private toast: ToastService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
     this.loadUsers();
+  }
+
+  goToApp(): void {
+    this.router.navigate(['/']);
   }
 
   ngAfterViewInit(): void {

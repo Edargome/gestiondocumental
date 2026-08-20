@@ -3,9 +3,19 @@
 </div>
 
 <div *ngIf="!isLoading">
-  <nav style="display: flex; flex-direction: row; align-items: center; padding: 8px 0; gap: 8px;">
+  <nav style="display: flex; flex-direction: row; align-items: center; padding: 8px 0; gap: 8px; background-color: rgba(244, 67, 54, 0.08); border-left: 4px solid #f44336; border-radius: 4px; padding-left: 12px;">
     <mat-icon color="warn">delete_sweep</mat-icon>
     <h2 style="margin: 0;">Papelera de reciclaje</h2>
+    <span style="flex: 1 1 auto"></span>
+    <button
+      mat-stroked-button
+      color="warn"
+      matTooltip="Salir de la papelera y volver al aplicativo"
+      (click)="exitTrash.emit()"
+    >
+      <mat-icon>arrow_back</mat-icon>
+      Volver al aplicativo
+    </button>
   </nav>
 
   <section>

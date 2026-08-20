@@ -21,7 +21,7 @@ export class DialogEditFolderComponent {
     @Inject(MAT_DIALOG_DATA) public folder: any
   ) {
     this.folderDisplay = this.folder_fb.group({
-      folderDescControl: [''],
+      folderDescControl: [this.folder.description || ''],
       folderNameControl: [this.folder.name, Validators.required],
     });
   }
