@@ -16,6 +16,7 @@ export interface DataUpdate {
 })
 export class DialogUpdateFileComponent {
   display: FormGroup;
+  isUploading = false;
   private fileTmp: any;
   constructor(
     private fileService: FileService,
@@ -42,8 +43,10 @@ export class DialogUpdateFileComponent {
     body.append('file', this.fileTmp.fileRaw);
     body.append('name', this.fileTmp.fileName);
     body.append('folder_id', this.data.folder_id.toString());
+    this.isUploading = true;
     this.fileService.updateFile(body, this.data.file_id).subscribe(
       (response) => {
+        this.isUploading = false;
         console.log('Respuesta Crear archivo', response.status);
         switch (response.status) {
           case 201:
@@ -68,10 +71,10 @@ export class DialogUpdateFileComponent {
         }
       },
       (error) => {
-        console.error(
-          'Error al subir el archivo:',
-          error.status,
-          error.message
+        this.isUploading = false;
+        console.error('Error al subir el archivo:', error);
+        this.toast.error(
+          error.error?.error ?? 'Error al subir el archivo. Intenta nuevamente.'
         );
       }
     );

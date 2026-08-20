@@ -25,11 +25,17 @@
       appearance="outline"
       mat-stroked-button
       color="primary"
-      [disabled]="display.invalid"
+      [disabled]="display.invalid || isUploading"
       (click)="sendFile()"
     >
-      Actualizar &nbsp;
-      <mat-icon>save</mat-icon>
+      <ng-container *ngIf="!isUploading; else uploadingTpl">
+        Actualizar &nbsp;
+        <mat-icon>save</mat-icon>
+      </ng-container>
+      <ng-template #uploadingTpl>
+        Subiendo... &nbsp;
+        <mat-spinner diameter="18" style="display: inline-block; vertical-align: middle;"></mat-spinner>
+      </ng-template>
     </button>
   </form>
 </div>

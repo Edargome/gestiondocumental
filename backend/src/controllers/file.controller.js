@@ -26,6 +26,11 @@ const {
 } = require('../services/permission.service');
 const { search } = require('../routes/folder.routes');
 
+// multer/busboy decodifica el nombre del archivo como latin1 aunque el navegador
+// lo envía en UTF-8, corrompiendo tildes/ñ (ej: "Política" -> "PolÃ­tica").
+const fixOriginalNameEncoding = (originalname) =>
+  Buffer.from(originalname, 'latin1').toString('utf8');
+
 // Controlador para subir archivos
 const uploadFile = async (req, res) => {
   const { folder_id } = req.body;
@@ -36,7 +41,7 @@ const uploadFile = async (req, res) => {
     if (!file) {
       return res.status(400).send('No se subió ningún archivo.');
     }
-    const fileName = path.parse(file.originalname);
+    const fileName = path.parse(fixOriginalNameEncoding(file.originalname));
     const existFile = await searchFileByFolder(fileName.name, fileName.ext, folder_id);
     if (existFile) {
       return res.status(203).send({ message: 'Documetno ya existe en el directorio.' });
@@ -84,7 +89,7 @@ const updateFile = async (req, res) => {
     if (!file) {
       return res.status(400).send('No se subió ningún archivo.');
     }
-    const fileName = path.parse(file.originalname);
+    const fileName = path.parse(fixOriginalNameEncoding(file.originalname));
     // Actualiza información en la base de datos (ya no toca extname — vive en file_versions)
     await updateFileData(user_id, folder_id, fileName.name, fileName.ext, file_id);
     const version = await fileVersion(file_id);

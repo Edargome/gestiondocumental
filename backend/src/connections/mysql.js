@@ -15,6 +15,7 @@ function createPool(prod) {
       user: process.env.DBUSER,
       password: process.env.DBPWD,
       database: process.env.DBNAME,
+      charset: 'utf8mb4',
       connectionLimit: 10, // Número máximo de conexiones
     });
     return pool;
@@ -24,6 +25,7 @@ function createPool(prod) {
       user: process.env.DBUSERDEV,
       password: process.env.DBPWDDEV,
       database: process.env.DBNAMEDEV,
+      charset: 'utf8mb4',
       connectionLimit: 10, // Número máximo de conexiones
     });
     return pool;

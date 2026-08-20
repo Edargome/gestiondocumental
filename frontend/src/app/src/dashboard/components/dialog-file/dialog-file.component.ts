@@ -12,6 +12,7 @@ import { ToastService } from 'src/app/src/services/toast.service';
 })
 export class DialogFileComponent {
   display: FormGroup;
+  isUploading = false;
   private fileTmp: any;
   constructor(
     private folderService: FolderService,
@@ -39,8 +40,10 @@ export class DialogFileComponent {
     body.append('file', this.fileTmp.fileRaw);
     body.append('name', this.fileTmp.fileName);
     body.append('folder_id', this.folder_id.toString());
+    this.isUploading = true;
     this.fileService.createFile(body).subscribe(
       (response) => {
+        this.isUploading = false;
         console.log('Respuesta Crear archivo', response.status);
         switch (response.status) {
           case 201:
@@ -65,10 +68,10 @@ export class DialogFileComponent {
         }
       },
       (error) => {
-        console.error(
-          'Error al subir el archivo:',
-          error.status,
-          error.message
+        this.isUploading = false;
+        console.error('Error al subir el archivo:', error);
+        this.toast.error(
+          error.error?.error ?? 'Error al subir el archivo. Intenta nuevamente.'
         );
       }
     );
