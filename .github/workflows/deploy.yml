@@ -1,7 +1,7 @@
 name: Deploy App
 on:
   push:
-    branches: [ "main" ] # Cambiar si la rama es diferente
+    branches: [ "newdental" ] # Cambiar si la rama es diferente
 
 jobs:
   deploy:
