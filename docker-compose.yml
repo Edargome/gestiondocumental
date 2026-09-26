@@ -46,6 +46,7 @@ services:
       - uploads_data_ges:/app/uploads
     networks:
       - gesdoc-net
+      - web_network
 
   frontend:
     build: ./frontend
