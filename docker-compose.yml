@@ -39,7 +39,7 @@ services:
       DBPWD: ${DBPWD:-gesdocpwd}
       DBNAME: ${DBNAME:-gestiondocumental}
       SECRET: ${SECRET:?La variable SECRET es requerida para firmar los JWT}
-      CORS_ORIGIN: ${CORS_ORIGIN:-https://gesdoc.intekgrow.com}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://62.171.179.194}
     ports:
       - "${BACKEND_PORT:-8000}:8000"
     volumes:

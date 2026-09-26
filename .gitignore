@@ -7,6 +7,7 @@ jspm_packages/
 /tmp
 /out-tsc
 /bazel-out
+.claude/
 .next
 out
 
