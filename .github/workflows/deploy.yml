@@ -16,10 +16,13 @@ jobs:
             exit 1
           fi
           echo "${{ secrets.ENV_FILE }}" > .env
+          
+      - name: Ensure external docker network exists
+        run: docker network inspect web_network >/dev/null 2>&1 || docker network create web_network
 
       - name: Validate Config
         run: docker compose config -q
-
+      
       - name: Docker Run
         run: |
           docker compose build

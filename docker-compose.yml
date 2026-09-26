@@ -1,7 +1,5 @@
 name: gesdocintekgrowcom
 
-run: docker network inspect web_network >/dev/null 2>&1 || docker network create web_network
-
 services:
   mysql:
     image: mysql:8
