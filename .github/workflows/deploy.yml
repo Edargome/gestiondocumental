@@ -11,12 +11,12 @@ jobs:
 
       - name: Inject Secrets
         run: |
-          if [ -z "${{ secrets.ENV_FILE }}" ]; then
-            echo "::error::El secret ENV_FILE no está configurado en el repositorio (Settings > Secrets and variables > Actions)."
+          if [ -z "${{ secrets.ENV_NEWDENTAL }}" ]; then
+            echo "::error::El secret ENV_NEWDENTAL no está configurado en el repositorio (Settings > Secrets and variables > Actions)."
             exit 1
           fi
-          echo "${{ secrets.ENV_FILE }}" > .env
-          
+          echo "${{ secrets.ENV_NEWDENTAL }}" > .env
+
       - name: Ensure external docker network exists
         run: docker network inspect web_network >/dev/null 2>&1 || docker network create web_network
 
