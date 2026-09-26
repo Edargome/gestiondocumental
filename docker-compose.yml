@@ -57,6 +57,7 @@ services:
       - "${FRONTEND_PORT:-4200}:80"
     networks:
       - gesdoc-net
+      - web_network
 
 volumes:
   mysql_data_ges:
@@ -65,3 +66,5 @@ volumes:
 networks:
   gesdoc-net:
     driver: bridge
+  web_network:
+    external: true
